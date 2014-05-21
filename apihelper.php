@@ -1,40 +1,80 @@
 <?php
 
 class APIHelper {
+
+	function viewDoc($param){
+		// make a call to the php class that returns the mongodb json
+		$coll = "";
+		$dBase = "";
+		$username = "";
+		$password = "";
+		$host = "";
+		$port = "";
+
+		$conn = new MongoClient("mongodb://${username}:${password}@{$host}:{$port}");
+		$db = $conn->$dBase;	
+		$collection = $conn->$db->$coll;
+		$doc = $collection->findOne(array("_id" => $param));
+    		return $doc;
+		$closed = $conn->close();
+	}
+
+	function viewAll(){
+		// make a call to the php class that returns the mongodb json
+		$coll = "";
+		$dBase = "";
+		$username = "";
+		$password = "";
+		$host = "";
+		$port = "";
+
+		$conn = new MongoClient("mongodb://${username}:${password}@{$host}:{$port}");
+		$db = $conn->$dBase;
+		$collection = $conn->$db->$coll;
+
+		$cursor = $collection->find();
+		$arr = array();
+		while ($cursor->hasNext())
+		{
+    		array_push($arr, $cursor->getNext());
+		}return $arr;
+		$closed = $conn->close();
+	}
 	
-	protected $doc;
-
-	//function __construct($doc){
-	//	$this->doc = $doc;
-	//}
-
-	function viewDoc($db, $collection,$param, $param1){
+	function viewAllByQuery($query){
 		// make a call to the php class that returns the mongodb json
-		$conn = new MongoClient();
-		$coll = $conn->$db->$collection;
-		$doc = $coll->findOne(array($param=>$param1));
-		
-		//foreach ($doc as $document) {
-    			echo $document .'<br />';
-		//	}
+		$coll = "";
+		$dBase = "";
+		$username = "";
+		$password = "";
+		$host = "";
+		$port = "";
+
+		$conn = new MongoClient("mongodb://${username}:${password}@{$host}:{$port}");
+		$db = $conn->$dBase;
+		$collection = $conn->$db->$coll;
+
+		$cursor = $collection->find($query);
+		$arr = array();
+		while ($cursor->hasNext())
+		{
+    		array_push($arr, $cursor->getNext());
+		}return $arr;
 		$closed = $conn->close();
 	}
 
-	function viewAll($db, $collection){
-		// make a call to the php class that returns the mongodb json
-		$conn = new MongoClient();
-		$coll = $conn->$db->$collection;
-		$doc = $coll->find();
-		foreach ($doc as $document) {
-    			print_r($document);
-			}
-		$closed = $conn->close();
-	}
+	function addDoc($entry){
+		$coll = "";
+		$dBase = "";
+		$username = "";
+		$password = "";
+		$host = "";
+		$port = "";
 
-	function addDoc($db, $collection, $entry){
-		$conn = new MongoClient();
-		$coll = $conn->$db->$collection;
-		$doc = $coll->insert($entry);
+		$conn = new MongoClient("mongodb://${username}:${password}@{$host}:{$port}");
+		$db = $conn->$dBase;
+		$collection = $conn->$db->$coll;
+		$doc = $collection->insert($entry);
 		$closed = $conn->close();
 	}
 	function count($db, $collection, $param, $param1){
@@ -43,9 +83,5 @@ class APIHelper {
 		$doc = $coll->count(array($param=>$param1));
 		$closed = $conn->close();
 	}
-	//function deleteDoc(){
-
-	//}
-
 }
 ?>

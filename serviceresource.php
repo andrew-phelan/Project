@@ -1,7 +1,6 @@
 
 <?php
 require('simple_html_dom.php');
-//require('checkresponse.php');
 ?>
 <?php
 class ServiceResource {
@@ -9,12 +8,7 @@ class ServiceResource {
 	public $url = "www.example.com";
 	public $hNumber = 'h1';
 
-//****Should This be performed  before invoked these functions?? ***//
-	//public function getResponse(){
-	//	$obj = new CheckResponse();
-	//	$res = $obj->getResponseCode();
-	//	return $res;
-	//}
+
 //****Grab Details Functions	
 	public function getLinks($url){
 	// get the actual links on the page as text
@@ -40,48 +34,28 @@ class ServiceResource {
 	public function getWords($url){
 	//get all text 
 		$resp = file_get_html('http://' .$url)->plaintext;
-		//if($resp != null){
-		//$words = array();
-		//$words = array_push(split(" ", $words), $resp);
-			//foreach($words as $element){
-		//		echo $words;
-			//}
-		//}
-		//else{
-		//	break;
-		//}
-		return $resp;
+		$words = strtolower($resp);
+		return $words;
 
-	}
-//** Make meta words ...under construction
-	public function removeIgnored($url){
-	// remove junk words
-	$words = $this->getWords($url);
-	$start = array();
-	$start = array();
-	foreach($word as $element)
-		if(in_array($element, $start)){
-			$finish = array_pop($start);
-		}else{
-			echo "Something went wrong!!";
+	}	
+	public function getKeywordsCount($urls, $keywords){
+		foreach($urls as $url){
+			$words = $this->getKeywords($url, $keywords);
+			foreach($words as $word){
+				//echo $word ."<br />";
+				//echo "<h2>Url: " .$url ."</h2>"  ."<h2>Total: " .count($words) ."</h2><br />";		
+			}
+			echo "<h2>Url: " .$url ."</h2>"  ."<h2>Total: " .count($words) ."</h2><br />";
 		}
-		return $finish;
 	}
 	
-	public function getKeywords($url){
-	// get all of the keywords
-		$resp = $this->getWords($url);
-		$afterIgnored = $this->removeIgnored($resp);
-		return $afterIgnored;
-		
-	}
-
-
-	public function createMetaKeywords(){
-	// create new keyword index
-		$match = array();
-		$key = $this->getKeywords();
-
+	public function getKeywords($url, $keywords){
+	// check if webpage array results matches $keywords
+			$links = $this->getWords($url);
+			$lower = strtolower($links);
+			$words = preg_split("/[\s,]+/", strtolower($links));
+			$result = array_intersect($words, $keywords);
+			return $result;
 	}
 
 //*** Count Functions
@@ -124,6 +98,16 @@ class ServiceResource {
 			return $count;
 	}
 
+	public function getCommentCount($url){
+	// return the count of comments on the page
+		$count = 0;
+		$resp = file_get_html('http://' .$url);
+		foreach($resp->find('comment') as $element){
+			$count +=1;
+		}
+			return $count;
+	}
+
 	public function getLinkCount($url){
 	// return the count of links on the page
 		$count = 0;
@@ -132,6 +116,13 @@ class ServiceResource {
 			$count +=1;
 		}
 			return $count;
+	}
+	public function count($var){
+		$start = 0;
+		foreach($var as $v){
+			$start+=1;
+		}
+		return $start;
 	}
 }
 
